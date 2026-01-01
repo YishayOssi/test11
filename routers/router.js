@@ -2,7 +2,7 @@ import express from "express";
 import { insertUser } from "../dal/mongodal.js";
 import { getDB } from "../db/mongodb.js";
 import { supabase } from "../db/supabase.js";
-import { insertAndChangeMessage } from "../dal/supabasedal.js";
+import { messageEncryption, insertMessage } from "../dal/supabasedal.js";
 
 export const Router = express.Router();
 
@@ -34,9 +34,10 @@ Router.use("/", async (req, res, next)=>{
 
 Router.post("/messages/encrypt",  async (req, res)=>{
     if(!req.body.message || !req.body.cipherType)
-        res.status(400).json({error: error.message});
+        res.status(400).send("One of the details you entered is incorrect!");
     else{
-        const message = await insertAndChangeMessage(req.body.message, req.body.cipherType)
+        const message_encryption = messageEncryption(req.body.message) 
+        const message = await insertAndChangeMessage(req.body)
         res.status(201).send("The message was saved successfully.")
     }
     }   
